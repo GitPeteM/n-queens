@@ -15,17 +15,17 @@
 
 //n = 4 =>4x4
 window.findNRooksSolution = function(n) {
-  console.log('n', n);
-  var solution = new Board({n: n}); //fixme
-  var pieceCount = 0;
-  for (var rowIndex = 0; rowIndex <= n; rowIndex++) {
+  // console.log('n', n);
+  let solution = new Board({n: n}); //fixme
+  let pieceCount = 0;
+  for (let rowIndex = 0; rowIndex <= n; rowIndex++) {
     if (pieceCount === n) {
-      console.log(solution.rows());
+      // console.log(solution.rows());
       return solution.rows();
     }
-    for (var colIndex = 0; colIndex < n; colIndex++) {
+    for (let colIndex = 0; colIndex < n; colIndex++) {
       solution.togglePiece(rowIndex, colIndex);
-      console.log('solutionPostToggle', solution.rows());
+      // console.log('solutionPostToggle', solution.rows());
       pieceCount++;
       if (solution.hasRowConflictAt(rowIndex) || solution.hasColConflictAt(colIndex)) {
         solution.togglePiece(rowIndex, colIndex);
@@ -41,8 +41,50 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  if (n === 0) {
+    return 0;
+  }
 
+  let solutionCount = 0;
+
+  let possibleBoard = (function() {
+
+    // let possibleBoard = new Array(n).fill(row);
+    // let board = []; // yup this one
+    debugger;
+    let row = new Array(n).fill(0);
+    let board = new Array(n).fill(row);
+    for (let i = 0; i < n; i++) {
+      board[i][i] = 1;
+    }
+    return board;
+  })();
+
+  let findCombination = (board = []) => {
+    if (board.length === n) {
+      solutionCount++;
+      return;
+    }
+
+    possibleBoard.forEach(row => {
+      if (board.length && rookHasConflict([...board, row])) {
+        return;
+      }
+      board.push(row);
+      findCombination(board);
+    });
+  };
+
+  let rookHasConflict = function(board) {
+    // debugger;
+    let numOfRowsToFill = n - board.length;
+    let row = new Array(n).fill(0);
+    let testBoardRows = numOfRowsToFill === 0 ? board : [...board, ...new Array(numOfRowsToFill).fill(row)];
+    let boardObj = new Board(testBoardRows);
+    return boardObj.hasAnyRowConflicts() || boardObj.hasAnyColConflicts(); // for n-queen, just add diagonal test case.
+  };
+
+  findCombination();
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
