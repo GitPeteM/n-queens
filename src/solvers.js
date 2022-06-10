@@ -47,36 +47,45 @@ window.countNRooksSolutions = function(n) {
 
   let solutionCount = 0;
 
-  let possibleBoard = (function() {
-
-    // let possibleBoard = new Array(n).fill(row);
-    // let board = []; // yup this one
-    debugger;
-    let row = new Array(n).fill(0);
-    let board = new Array(n).fill(row);
+  let possibleBoard = function() {
+    let tempBoard = [];
+    // debugger;
     for (let i = 0; i < n; i++) {
-      board[i][i] = 1;
+      let row = new Array(n).fill(0);
+      row[i] = 1;
+      tempBoard.push(row);
     }
-    return board;
-  })();
+    return tempBoard;
+  };
+
 
   let findCombination = (board = []) => {
-    if (board.length === n) {
+    // console.log(board.length);
+
+    if (board.length === n && !rookHasConflict(board)) {
+      console.log('rookHasConflict - base case', rookHasConflict(board));
       solutionCount++;
+      console.log('solutionCount: ', solutionCount);
+      // console.log("board: ", board);
+      return;
+    }
+    if (rookHasConflict(board)) {
+      // console.log('rookHasConflict - true?', rookHasConflict(board));
       return;
     }
 
-    possibleBoard.forEach(row => {
-      if (board.length && rookHasConflict([...board, row])) {
-        return;
-      }
-      board.push(row);
-      findCombination(board);
+    let testBoard = possibleBoard();
+    testBoard.forEach(row => {
+      // board.push(row);
+      // console.log("test: ", [...board, row]);
+      findCombination([...board, row]);
     });
+
   };
 
   let rookHasConflict = function(board) {
-    // debugger;
+
+
     let numOfRowsToFill = n - board.length;
     let row = new Array(n).fill(0);
     let testBoardRows = numOfRowsToFill === 0 ? board : [...board, ...new Array(numOfRowsToFill).fill(row)];
@@ -89,18 +98,96 @@ window.countNRooksSolutions = function(n) {
   return solutionCount;
 };
 
+
+
+
+
+
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+
+  let solution = new Board({n: n}); //fixme
+  let pieceCount = 0;
+  for (let rowIndex = 0; rowIndex <= n; rowIndex++) {
+    if (pieceCount === n) {
+      // console.log(solution.rows());
+      return solution.rows();
+    }
+    for (let colIndex = 0; colIndex < n; colIndex++) {
+      solution.togglePiece(rowIndex, colIndex);
+      // console.log('solutionPostToggle', solution.rows());
+      pieceCount++;
+      if (solution.hasRowConflictAt(rowIndex) || solution.hasColConflictAt(colIndex) || solution.hasMajorDiagonalConflictAt(colIndex) || solution.hasMinorDiagonalConflictAt(colIndex)) {
+        solution.togglePiece(rowIndex, colIndex);
+        pieceCount--;
+        continue;
+      }
+      break;
+    }
+  }
 
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
 };
 
+
+
+
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  if (n === 0) {
+    return 0;
+  }
 
+  let solutionCount = 0;
+
+  let possibleBoard = function() {
+    let tempBoard = [];
+    // debugger;
+    for (let i = 0; i < n; i++) {
+      let row = new Array(n).fill(0);
+      row[i] = 1;
+      tempBoard.push(row);
+    }
+    return tempBoard;
+  };
+
+
+  let findCombination = (board = []) => {
+    // console.log(board.length);
+
+    if (board.length === n && !rookHasConflict(board)) {
+      console.log('rookHasConflict - base case', rookHasConflict(board));
+      solutionCount++;
+      console.log('solutionCount: ', solutionCount);
+      // console.log("board: ", board);
+      return;
+    }
+    if (rookHasConflict(board)) {
+      // console.log('rookHasConflict - true?', rookHasConflict(board));
+      return;
+    }
+
+
+    let testBoard = possibleBoard();
+    testBoard.forEach(row => {
+      // board.push(row);
+      // console.log("test: ", [...board, row]);
+      findCombination([...board, row]);
+    });
+
+  };
+
+  let rookHasConflict = function(board) {
+
+    let numOfRowsToFill = n - board.length;
+    let row = new Array(n).fill(0);
+    let testBoardRows = numOfRowsToFill === 0 ? board : [...board, ...new Array(numOfRowsToFill).fill(row)];
+    let boardObj = new Board(testBoardRows);
+    return boardObj.hasAnyRowConflicts() || boardObj.hasAnyColConflicts() || boardObj.hasAnyMajorDiagonalConflicts() || boardObj.hasAnyMinorDiagonalConflicts(); // for n-queen, just add diagonal test case.
+  };
+
+  findCombination();
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };

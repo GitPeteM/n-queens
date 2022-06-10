@@ -95,13 +95,12 @@
 
     // test if any rows on this board contain conflicts
     hasAnyRowConflicts: function() {
-      var rows = this.rows();
-      let isTrue = false;
-      for (let i = 0; i < rows.length; i++) {
-        if (isTrue) {
+      var rows = this.get('n');
+
+      for (let i = 0; i < rows; i++) {
+        if (this.hasRowConflictAt(i)) {
           return true;
         }
-        isTrue = this.hasRowConflictAt(i);
       }
       return false;
     },
@@ -113,8 +112,12 @@
     //
     // test if a specific column on this board contains a conflict
     hasColConflictAt: function(colIndex) {
+      // 0
       var rows = this.rows();
       var pieceCount = 0;
+      //i == 0 colIndex = 1
+      //
+
       for (let i = 0; i < rows.length; i++) {
         if (rows[i][colIndex] === 1) {
           pieceCount++;
@@ -127,17 +130,22 @@
     },
 
     // test if any columns on this board contain conflicts
+
+
+    // [[0, 1][0, 1]];
+
     hasAnyColConflicts: function() {
       var rows = this.rows();
       var firstRow = rows[0];
+
       var isTrue = false;
       for (let i = 0; i < firstRow.length; i++) {
         if (isTrue) {
           return true;
-        }
+        } // i = 1
         isTrue = this.hasColConflictAt(i);
       }
-      return false; // fixme
+      return isTrue; // fixme
     },
 
 
@@ -181,7 +189,7 @@
         }
         isTrue = this.hasMajorDiagonalConflictAt(0, i);
       }
-      return false; // fixme
+      return isTrue; // fixme
     },
 
 
@@ -225,7 +233,7 @@
         }
         isTrue = this.hasMinorDiagonalConflictAt(rows[0].length - 1, i);
       }
-      return false; // fixme
+      return isTrue; // fixme
     }
 
     /*--------------------  End of Helper Functions  ---------------------*/
